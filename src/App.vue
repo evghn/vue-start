@@ -4,12 +4,19 @@ import { computed, ref, watch, watchEffect } from 'vue';
 const hello = "hello user";
 const task = ref()
 const _dataList = ref([])
-const filter = ref(false)
 const taskLevel = ref()
 const errorTask = ref(false)
 const errorLevel = ref(false)
 const errorTaskMessage = ref("Не заполнено название задачи")
 const errorLevelMessage = ref("Не выбран уровень задачи")
+const statusFilter = ref()
+const levelFilter = ref()
+
+
+const todo = localStorage.getItem("todo")
+if (todo) {
+  _dataList.value = JSON.parse(todo)
+}
 
 const level = ref([
   { id: 0, text: '' },
@@ -18,15 +25,50 @@ const level = ref([
   { id: 3, text: 'Сложная' }
 ])
 
+const statuses = ref([
+  { id: 0, text: '' },
+  { id: 1, text: 'Новая' },
+  { id: 2, text: 'В процессе' },
+  { id: 3, text: 'Выполнена' },
+  { id: 4, text: 'Удалена' }
+])
+
+const getStatusId = (text) => {
+  const index = statuses.value.findIndex((item) =>
+    item.text.toLowerCase().includes(text.toLowerCase())
+  )
+  if (index !== -1) {
+    return statuses.value[index].id
+  }
+}
+
+const getStatusText = (id) => {
+  const index = statuses.value.findIndex((item) => item.id == id)
+
+  if (index !== -1) {
+    return statuses.value[index].text
+  }
+}
 
 
 const count = computed(() => dataList.value.length)
 
-const dataList = computed(() =>
-  filter.value
-    ? _dataList.value.filter(item => item.status === "ready")
-    : _dataList.value
-)
+const dataList = computed(() => {
+
+  if (levelFilter.value || statusFilter.value) {
+    const data = ref([..._dataList.value])
+    if (statusFilter.value) {
+      data.value = data.value.filter(item => item.status === statusFilter.value)
+    }
+
+    if (levelFilter.value) {
+      data.value = data.value.filter(item => item.level === levelFilter.value)
+    }
+    return data.value
+  }
+
+  return _dataList.value
+})
 
 const clearTasks = () => {
   _dataList.value = []
@@ -47,15 +89,19 @@ const addTask = () => {
 
 
 
+  // console.log(getStatusId("новая"));
 
   _dataList.value.push({
     id: Date.now(),
     value: task.value,
-    level: "low",
-    status: "active"
+    level: taskLevel.value,
+    status: getStatusId("новая")
   })
-  console.log(task.value);
+
+  localStorage.setItem("todo", JSON.stringify(_dataList.value))
+
   task.value = "";
+  taskLevel.value = 0
 }
 
 
@@ -71,24 +117,30 @@ const handleTask = (e) => {
   }
 }
 
-watch(() => _dataList.value,
-  (newVal) => {
-    if (newVal)
-      console.log("dataList изменен", newVal);
-  },
-  {
-    deep: true,
-    immediate: true
-  }
-)
+const clearFilter = () => {
+  levelFilter.value = undefined;
+  statusFilter.value = undefined
+}
+
+// watch(() => _dataList.value,
+//   () => {
+//     // if (newVal)
+//       // console.log("dataList изменен", newVal);
+//   },
+//   {
+//     deep: true,
+//     immediate: true
+//   }
+// )
 
 watchEffect(
   () => {
-    console.log("errorLevel", errorLevel.value);
+    // console.log("errorLevel", errorLevel.value);
     if (errorLevel.value && taskLevel.value) {
       errorLevel.value = false
     }
-    // console.log(task.value);
+    // console.log("statusFilter", statusFilter.value);
+    // console.log("levelFilter", levelFilter.value);
   }
 )
 
@@ -127,9 +179,26 @@ watchEffect(
 
 
       <div class="flex gap-3 justify-between border-blue-900 border p-3 rounded">
+        <div class="flex gap-3">
+          <div>
+            Статус задачи:
+            <select v-model="statusFilter" class="border border-gray-400 p-2 rounded">
+              <option v-for="item in statuses" :key="item.id" :value="item.id">{{ item.text }}</option>
+            </select>
+          </div>
+
+          <div>
+            Уровень сложности:
+            <select v-model="levelFilter" class="border border-gray-400 p-2 rounded">
+              <option v-for="item in level" :key="item.id" :value="item.id">{{ item.text }}</option>
+            </select>
+          </div>
+
+
+        </div>
         <div><a href="" @click.prevent="filter = !filter">filter</a></div>
         <div class="flex gap-3 justify-between">
-          <a class="border px-4 py-2 rounded-lg" href="" @click.prevent="handleClick">Сброс фильтра</a>
+          <a class="border px-4 py-2 rounded-lg" href="" @click.prevent="clearFilter">Сброс фильтра</a>
           <a class="border px-4 py-2 rounded-lg bg-red-400 text-white" href="" @click.prevent="clearTasks">Очистка
             списка</a>
         </div>
@@ -141,12 +210,15 @@ watchEffect(
         <div class="text-xl mb-2">Количество задач: <span class="font-bold">{{ count }}</span></div>
         <ul v-if="dataList.length" class="flex flex-col gap-2">
           <li v-for="(item, key) in dataList" :key="key" class="text-lg">
-            <div class="flex  w-full justify-between border border-blue-200 px-3 py-2 rounded">
-              <div>
+            <div class="flex  w-full border border-blue-200 px-3 py-2 rounded gap-3">
+              <div class="grow">
                 {{ item.value }}
               </div>
+              <div class="px-3">
+                {{ level[item.level].text }}
+              </div>
               <div>
-                {{ item.status }}
+                {{ getStatusText(item.status) }}
               </div>
             </div>
 
