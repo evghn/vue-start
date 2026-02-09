@@ -14,14 +14,11 @@ const dataList = computed(() =>
     : _dataList.value
 )
 
-const handleClick = () => {
+const clearTasks = () => {
   _dataList.value = []
 }
 
-
-const keyDown = () => {
-  // if (e.key == "Enter") {
-  // data.value = e.target.value
+const addTask = () => {
   _dataList.value.push({
     id: Date.now(),
     value: data.value,
@@ -29,11 +26,6 @@ const keyDown = () => {
   })
   console.log(data.value);
   data.value = "";
-
-
-  // data.value = ""
-  // }
-
 }
 
 
@@ -55,31 +47,44 @@ watch(_dataList.value,
     {{ hello }}
     <div class="flex flex-col gap-3">
 
-      <div class="flex gap-3">
-        <input type="text" v-model.number="data" @keydown.enter="keyDown">
-        <a href="" @click.prevent="handleClick">clear</a>
-        <a href="" @click.prevent="filter = !filter">filter</a>
-
+      <div class="flex gap-3 justify-between">
+        <input class="border px-4 text-2xl rounded w-[90%] active:border  active:border-gray-200" type="text"
+          v-model.number="data" @keydown.enter="addTask">
+        <a class="border px-4 py-2 rounded-lg bg-green-600   text-white min-w-40 tetx-center" href=""
+          @click.prevent="addTask">Добавить
+          задачу</a>
+      </div>
+      <div class="flex gap-3 justify-between border-blue-900 border p-3 rounded">
+        <div><a href="" @click.prevent="filter = !filter">filter</a></div>
+        <div class="flex gap-3 justify-between">
+          <a class="border px-4 py-2 rounded-lg" href="" @click.prevent="handleClick">Сброс фильтра</a>
+          <a class="border px-4 py-2 rounded-lg bg-red-400 text-white" href="" @click.prevent="clearTasks">Очистка
+            списка</a>
+        </div>
       </div>
 
-      <div>Todo list</div>
-      <div>Количество задач: {{ count }}</div>
-      <ul v-if="dataList.length" class="flex flex-col gap-2">
-        <li v-for="(item, key) in dataList" :key="key">
-          <div class="flex  w-full justify-between border border-blue-200 px-3 py-2 rounded">
-            <div>
-              {{ item.value }}
-            </div>
-            <div>
-              {{ item.status }}
-            </div>
-          </div>
+      <div class="border-gray-400 border rounded p-3">
+        <div class="text-3xl text-center py-3">Todo list</div>
 
-        </li>
-      </ul>
-      <div v-show="!dataList.length">Список пустой</div>
+        <div class="text-xl mb-2">Количество задач: <span class="font-bold">{{ count }}</span></div>
+        <ul v-if="dataList.length" class="flex flex-col gap-2">
+          <li v-for="(item, key) in dataList" :key="key" class="text-lg">
+            <div class="flex  w-full justify-between border border-blue-200 px-3 py-2 rounded">
+              <div>
+                {{ item.value }}
+              </div>
+              <div>
+                {{ item.status }}
+              </div>
+            </div>
 
-      {{ dataList }}
+          </li>
+        </ul>
+        <div v-show="!dataList.length" class="mt-3 text-3xl text-center text-decoration-line: underline">Список пустой
+        </div>
+
+        {{ dataList }}
+      </div>
     </div>
   </div>
 </template>
