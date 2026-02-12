@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch, watchEffect } from 'vue';
+import TestComponent from './components/TestComponent.vue';
 
 const hello = "hello user";
 const task = ref()
@@ -11,6 +12,8 @@ const errorTaskMessage = ref("Не заполнено название зада�
 const errorLevelMessage = ref("Не выбран уровень задачи")
 const statusFilter = ref()
 const levelFilter = ref()
+
+const testCount = ref(0)
 
 
 const todo = localStorage.getItem("todo")
@@ -203,10 +206,15 @@ watchEffect(
   }
 )
 
+
+const sendCount = (val) => {
+  console.log(val);
+  testCount.value = val
+}
 </script>
 
 <template>
-  <div class="p-10">
+  <div v-if="false" class="p-10">
     {{ hello }}
     <div class="flex flex-col gap-3">
 
@@ -301,6 +309,14 @@ watchEffect(
         {{ dataList }}
       </div>
     </div>
+  </div>
+  <div class="p-10 bg-gray-700 text-white min-h-screen">
+    <div>{{ testCount }}</div>
+    <test-component class="p-3 border border-white m-3" :index="1" :countChild="testCount"
+      @change-count="sendCount"></test-component>
+    <test-component class="p-3 border border-white m-3" :index="2" :countChild="testCount" v-on:change-count="sendCount"
+      v-on:click="sendCount(0)"></test-component>
+
   </div>
 </template>
 
