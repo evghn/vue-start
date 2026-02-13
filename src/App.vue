@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref, watch, watchEffect } from 'vue';
-import TestComponent from './components/TestComponent.vue';
+import MainChild from "@/components/childComponents/MainChild.vue"
 
 const hello = "hello user";
 const task = ref()
@@ -12,8 +12,6 @@ const errorTaskMessage = ref("Не заполнено название зада�
 const errorLevelMessage = ref("Не выбран уровень задачи")
 const statusFilter = ref()
 const levelFilter = ref()
-
-const testCount = ref(0)
 
 
 const todo = localStorage.getItem("todo")
@@ -207,10 +205,6 @@ watchEffect(
 )
 
 
-const sendCount = (val) => {
-  console.log(val);
-  testCount.value = val
-}
 </script>
 
 <template>
@@ -291,7 +285,7 @@ const sendCount = (val) => {
                 :class="[getBgStatus(item.status_id), true ? 'class-item' : 'class-item2']">
                 {{ getStatusText(item.status_id) }}
               </div>
-              <div class="flex gap-3 border-l pl-5 ml-5 min-w-[300px]">
+              <div class="flex gap-3 border-l pl-5 ml-5 min-w-75">
                 <a v-if="item.status_id < getStatusId('ready')"
                   class="border px-4 py-2 rounded-lg bg-blue-700 text-white" href=""
                   @click.prevent="changeStatus(key)">Сменить статус</a>
@@ -310,14 +304,8 @@ const sendCount = (val) => {
       </div>
     </div>
   </div>
-  <div class="p-10 bg-gray-700 text-white min-h-screen">
-    <div>{{ testCount }}</div>
-    <test-component class="p-3 border border-white m-3" :index="1" :countChild="testCount"
-      @change-count="sendCount"></test-component>
-    <test-component class="p-3 border border-white m-3" :index="2" :countChild="testCount" v-on:change-count="sendCount"
-      v-on:click="sendCount(0)"></test-component>
+  <main-child></main-child>
 
-  </div>
 </template>
 
 <style scoped>

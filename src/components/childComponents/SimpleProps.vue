@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 
 const props = defineProps(['countChild', 'index'])
 const emit = defineEmits(['changeCount'])
