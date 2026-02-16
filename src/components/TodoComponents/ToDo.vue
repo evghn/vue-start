@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import TodoList from './TodoList.vue'
 import FilterPanel from './FilterPanel.vue'
 import TodoForm from './TodoForm.vue'
-import { getStatusId } from './model.todo'
+import { getStatusId } from './models/model.todo'
 const _dataList = ref([])
 
 
@@ -51,65 +51,32 @@ const addTask = (dataTask) => {
 
 const clearTasks = () => _dataList.value = [];
 
-// const changeStatus = (index, isDelete = false) => {
-//   if (_dataList.value[index].status_id < getStatusId("ready") || _dataList.value[index].status_id < getStatusId("remove") && isDelete) {
-//     if (isDelete) {
-//       _dataList.value[index].status_id = getStatusId("remove")
-//     } else {
-//       _dataList.value[index].status_id++;
-//     }
-//   }
-// }
+const changeStatus = (data) => {
+  const { index, isDelete } = data
+  if (_dataList.value[index].status_id < getStatusId("ready") || _dataList.value[index].status_id < getStatusId("remove") && isDelete) {
+    if (isDelete) {
+      _dataList.value[index].status_id = getStatusId("remove")
+    } else {
+      _dataList.value[index].status_id++;
+    }
+  }
+}
 
 
 </script>
 <template>
-  <div class="p-10">
+  <div class="p-10 bg-gray-500 min-h-screen">
     <div class="flex flex-col gap-3">
 
       <todo-form @add-task="addTask"></todo-form>
-      <!-- <filter-panel @clear-tasks="clearTasks"></filter-panel>
-      <todo-list v-model="dataList"></todo-list> -->
+      <!-- <filter-panel @clear-tasks="clearTasks"></filter-panel>-->
+      <todo-list v-model="dataList" @change-status="changeStatus"></todo-list>
     </div>
+    {{ _dataList }}
   </div>
-  {{ _dataList }}
 </template>
 
 <style scoped>
-.task-indicator {
-  padding: 4px 15px;
-  border-radius: 7px;
-  color: rgb(68, 67, 67) !important;
-}
-
-.new {
-  background-color: rgb(169, 169, 255);
-}
-
-.processing {
-  background-color: rgb(246, 250, 144);
-}
-
-.ready {
-  background-color: rgb(169, 255, 183);
-}
-
-.remove {
-  background-color: rgb(255, 169, 169);
-}
-
-.low {
-  background-color: rgb(169, 252, 255);
-}
-
-.middle {
-  background-color: rgb(251, 151, 247);
-}
-
-.hard {
-  background-color: rgb(237, 86, 86);
-}
-
 .form-border {
   border: 1px solid rgb(167, 207, 248);
 }

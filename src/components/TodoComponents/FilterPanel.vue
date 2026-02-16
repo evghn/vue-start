@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { levels, statuses } from './model.todo';
+import { levels, statuses } from './models/model.todo';
 
 
 const emit = defineEmits(['clearTasks'])

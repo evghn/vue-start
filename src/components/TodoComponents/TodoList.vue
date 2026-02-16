@@ -1,31 +1,32 @@
 <script setup>
-import { computed, watch } from 'vue';
-import { levels, statuses } from './model.todo';
+import { computed } from 'vue';
+import { getBgLevel, getBgStatus, getStatusId, getStatusText, levels } from './models/model.todo';
 
 
-const dataList = defineModel()
-
-
+const model = defineModel()
+const emit = defineEmits(["changeStatus"])
 
 
 const count = computed(() => dataList.value.length)
+const dataList = computed(() => model.value)
+
+
+const changeStatus = (index, isDelete = false) => {
+  emit("changeStatus", { index, isDelete })
+}
 
 
 
 
 
-
-
-
-
-watch(() => _dataList.value,
-  () => {
-    localStorage.setItem("todo", JSON.stringify(_dataList.value))
-  },
-  {
-    deep: true,
-  }
-)
+// watch(() => model.value,
+//   () => {
+//     localStorage.setItem("todo", JSON.stringify(model.value))
+//   },
+//   {
+//     deep: true,
+//   }
+// )
 </script>
 <template>
   <div class="border-gray-400 border rounded p-3">
@@ -57,7 +58,40 @@ watch(() => _dataList.value,
     </ul>
     <div v-show="!dataList.length" class="mt-3 text-3xl text-center text-decoration-line: underline">Список пустой
     </div>
-
-    {{ dataList }}
   </div>
 </template>
+<style scoped>
+.task-indicator {
+  padding: 4px 15px;
+  border-radius: 7px;
+  color: rgb(68, 67, 67) !important;
+}
+
+.new {
+  background-color: rgb(169, 169, 255);
+}
+
+.processing {
+  background-color: rgb(246, 250, 144);
+}
+
+.ready {
+  background-color: rgb(169, 255, 183);
+}
+
+.remove {
+  background-color: rgb(255, 169, 169);
+}
+
+.low {
+  background-color: rgb(169, 252, 255);
+}
+
+.middle {
+  background-color: rgb(251, 151, 247);
+}
+
+.hard {
+  background-color: rgb(237, 86, 86);
+}
+</style>
