@@ -1,6 +1,6 @@
 <script setup>
 import { inject } from 'vue';
-import { getBgStatus, getStatusId, getStatusText } from './models/model.todo';
+import { getBgLevel, getBgStatus, getStatusId, getStatusText, levels } from './models/model.todo';
 import TaskIndicator from './TaskIndicator.vue';
 
 const props = defineProps(["item", "keyItem"])
@@ -10,10 +10,14 @@ const { changeStatus } = inject("changeStatus")
 <template>
   <div class="flex  w-full items-center border border-blue-200 px-3 py-2 rounded gap-3">
     <div class="grow">
+      {{ props.item.level_id }}
       {{ props.item.value }}
     </div>
     <task-indicator :class="[getBgStatus(props.item.status_id)]">{{
       getStatusText(props.item.status_id) }}</task-indicator>
+    <task-indicator :class="[getBgLevel(props.item.level_id)]">{{
+      levels[props.item.level_id].text }}</task-indicator>
+
     <div class="flex gap-3 border-l pl-5 ml-5 min-w-75">
       <a v-if="props.item.status_id < getStatusId('ready')" class="border px-4 py-2 rounded-lg bg-blue-700 text-white"
         href="" @click.prevent="changeStatus(props.keyItem)">Сменить статус</a>

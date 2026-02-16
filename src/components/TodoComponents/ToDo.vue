@@ -1,14 +1,18 @@
 <script setup>
-import { computed, provide, ref, watch } from 'vue'
+import { computed, onBeforeMount, provide, ref, watch } from 'vue'
 import TodoList from './TodoList.vue'
 import FilterPanel from './FilterPanel.vue'
 import TodoForm from './TodoForm.vue'
 import { getStatusId } from './models/model.todo'
+import { getTasks } from './api/getTasks'
+import { createTask } from './api/createTask'
+import { updateTask } from './api/updateTask'
 const _dataList = ref([])
-
-
 const statusFilter = ref()
 const levelFilter = ref()
+
+// vwVK5lRyDU-oAAaOovGCSl5vuQvRbzAM
+
 
 const dataList = computed(() => {
 
@@ -27,21 +31,29 @@ const dataList = computed(() => {
   return _dataList.value
 })
 
-const todo = localStorage.getItem("todo")
-if (todo) {
-  _dataList.value = JSON.parse(todo)
-}
+// const todo = localStorage.getItem("todo")
+// if (todo) {
+//   _dataList.value = JSON.parse(todo)
+// }
 
 
-const addTask = (dataTask) => {
-  console.log(dataTask);
-
-  _dataList.value.push({
-    id: Date.now(),
+const addTask = async (dataTask) => {
+  // _dataList.value.push({
+  //   id: Date.now(),
+  //   value: dataTask.task.value,
+  //   level_id: dataTask.taskLevel.value,
+  //   status_id: getStatusId("новая")
+  // })
+  const task = ref({
     value: dataTask.task.value,
     level_id: dataTask.taskLevel.value,
     status_id: getStatusId("новая")
   })
+  const result = await createTask(task)
+  if (result) {
+    _dataList.value.push(task.value)
+  }
+
 }
 
 
@@ -49,11 +61,16 @@ const addTask = (dataTask) => {
 const clearTasks = () => _dataList.value = [];
 
 const changeStatus = (index, isDelete = false) => {
-  if (_dataList.value[index].status_id < getStatusId("ready") || _dataList.value[index].status_id < getStatusId("remove") && isDelete) {
+  const _task = _dataList.value[index]
+  if (_task.status_id < getStatusId("ready") || _task.status_id < getStatusId("remove") && isDelete) {
     if (isDelete) {
-      _dataList.value[index].status_id = getStatusId("remove")
+      _task.status_id = getStatusId("remove")
     } else {
-      _dataList.value[index].status_id++;
+      _task.status_id++;
+    }
+
+    if (updateTask(_task)) {
+      _dataList.value[index] = _task
     }
   }
 }
@@ -70,6 +87,11 @@ watch(() => _dataList.value,
     deep: true,
   }
 )
+
+onBeforeMount(async () => {
+  const data = await getTasks();
+  _dataList.value = data
+})
 
 </script>
 <template>
