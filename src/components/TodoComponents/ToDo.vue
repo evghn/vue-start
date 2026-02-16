@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import TodoList from './TodoList.vue'
 import FilterPanel from './FilterPanel.vue'
 import TodoForm from './TodoForm.vue'
@@ -33,9 +33,6 @@ if (todo) {
 }
 
 
-
-
-
 const addTask = (dataTask) => {
   console.log(dataTask);
 
@@ -45,14 +42,13 @@ const addTask = (dataTask) => {
     level_id: dataTask.taskLevel.value,
     status_id: getStatusId("новая")
   })
-
 }
+
 
 
 const clearTasks = () => _dataList.value = [];
 
-const changeStatus = (data) => {
-  const { index, isDelete } = data
+const changeStatus = (index, isDelete = false) => {
   if (_dataList.value[index].status_id < getStatusId("ready") || _dataList.value[index].status_id < getStatusId("remove") && isDelete) {
     if (isDelete) {
       _dataList.value[index].status_id = getStatusId("remove")
@@ -62,6 +58,18 @@ const changeStatus = (data) => {
   }
 }
 
+provide("changeStatus", {
+  changeStatus
+})
+
+watch(() => _dataList.value,
+  () => {
+    localStorage.setItem("todo", JSON.stringify(_dataList.value))
+  },
+  {
+    deep: true,
+  }
+)
 
 </script>
 <template>
@@ -69,8 +77,8 @@ const changeStatus = (data) => {
     <div class="flex flex-col gap-3">
 
       <todo-form @add-task="addTask"></todo-form>
-      <!-- <filter-panel @clear-tasks="clearTasks"></filter-panel>-->
-      <todo-list v-model="dataList" @change-status="changeStatus"></todo-list>
+      <filter-panel @clear-tasks="clearTasks" v-model:status="statusFilter" v-model:level="levelFilter"></filter-panel>
+      <todo-list v-model="dataList"></todo-list>
     </div>
     {{ _dataList }}
   </div>

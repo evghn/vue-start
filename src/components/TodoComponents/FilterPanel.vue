@@ -1,12 +1,11 @@
 <script setup>
-import { ref } from 'vue';
 import { levels, statuses } from './models/model.todo';
 
 
 const emit = defineEmits(['clearTasks'])
 
-const statusFilter = ref()
-const levelFilter = ref()
+const levelFilter = defineModel("level")
+const statusFilter = defineModel("status")
 
 
 
@@ -39,7 +38,6 @@ const clearFilter = () => {
 
 
     </div>
-    <div><a href="" @click.prevent="filter = !filter">filter</a></div>
     <div class="flex gap-3 justify-between">
       <a class="border px-4 py-2 rounded-lg" href="" @click.prevent="clearFilter">Сброс фильтра</a>
       <a class="border px-4 py-2 rounded-lg bg-red-400 text-white" href="" @click.prevent="clearTasks">Очистка
