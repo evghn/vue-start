@@ -1,6 +1,6 @@
-import { token, urlAPI } from './env.api'
+import { http, token, urlAPI } from './env.api'
 
-export const createTask = async (task) => {
+export const createTaskOLd = async (task) => {
   const url = `${urlAPI}/tasks`
 
   const headers = {
@@ -24,6 +24,19 @@ export const createTask = async (task) => {
       // console.log(respData)
 
       // return response.json()
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export const createTask = async (task) => {
+  try {
+    const response = await http.post('/tasks', task.value)
+
+    if (response.status === 200) {
+      task.value = response.data.data[0]
+      return true
     }
   } catch (e) {
     console.log(e)

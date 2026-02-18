@@ -1,6 +1,6 @@
-import { token, urlAPI } from './env.api'
+import { http, token, urlAPI } from './env.api'
 
-export const updateTask = async (task) => {
+export const updateTaskOld = async (task) => {
   // console.log(task)
 
   const url = `${urlAPI}/tasks/${task.id}`
@@ -27,6 +27,15 @@ export const updateTask = async (task) => {
 
       // return response.json()
     }
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export const updateTask = async (task) => {
+  try {
+    const response = await http.patch(`/tasks/${task.id}`, task)
+    return response.status === 200
   } catch (e) {
     console.log(e)
   }
